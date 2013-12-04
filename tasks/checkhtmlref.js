@@ -13,12 +13,16 @@ module.exports = function(grunt) {
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
 
+  function ref(link) {
+    return link.replace(/[#?].*$/,'');
+  }
+
   grunt.registerMultiTask('checkhtmlref', 'Check your html files for broken internal references to other resources', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      expression: /href=['"]([^ "'<>]+)/g,
+      expression: /href=['"]([^ "']+)['"]/g,
       htmlLinkExp: /(\.html$)|(.\/$)/, // link to html documents
-      externalLinkExp: /^[a-z]+:\/\/.+$/ // external links
+      externalLinkExp: /^[a-z]+:\/\// // external links
     });
 
     var files = [];
@@ -45,7 +49,7 @@ module.exports = function(grunt) {
             var match = options.expression.exec(content);
             while(match != null) {
               var link = match[1];
-              if (options.htmlLinkExp.exec(link) && !options.externalLinkExp.exec(link)) {
+              if (options.htmlLinkExp.exec(ref(link)) && !options.externalLinkExp.exec(ref(link))) {
                 result.push(link);
               }
               match = options.expression.exec(content);
@@ -64,18 +68,19 @@ module.exports = function(grunt) {
         var error = false;
         var file = f.file;
         f.links.forEach(function(link) {
-          if (link.match(/\/$/)) { link += 'index.html'; }
+          var reflink = ref(link);
+          if (reflink.match(/\/$/)) { reflink += 'index.html'; }
 
-          if (link.match(/^\//)) {
+          if (reflink.match(/^\//)) {
             // absolute link
-            link = link.substr(1);
+            reflink = reflink.substr(1);
           } else {
             // relative link, add the relative file path
             var path = file.substr(0,file.lastIndexOf('/')+1);
-            link = path + link;
+            reflink = path + reflink;
           }
 
-          if (urls.indexOf(link) === -1) {
+          if (urls.indexOf(reflink) === -1) {
             error = true;
             grunt.log.warn("broken link: %s in file %s",
                            link,
