@@ -37,17 +37,11 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
+#### options.expression
 Type: `String`
-Default value: `',  '`
+Default value: `/href=['"]([^ "'<>]+)/g`
 
-A string value that is used to do something with whatever.
-
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
-
-A string value that is used to do something else with whatever else.
+Regular Expression to find all internal references in html files.
 
 ### Usage Examples
 
@@ -57,9 +51,9 @@ In this example, the default options are used to do something with whatever. So 
 ```js
 grunt.initConfig({
   checkhtmlref: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
+    "internal-links": {
+		  cwd: '<%= folders.tmp %>',
+			src: [ "**/*.html" ]
     },
   },
 });
@@ -75,8 +69,14 @@ grunt.initConfig({
       separator: ': ',
       punctuation: ' !!!',
     },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
+    "internal-html-links": {
+		  cwd: '<%= folders.tmp %>',
+			src: [ "**/*.html" ]
+    },
+    "internal-ressources": {
+		  options: { expression: /\w+ref=['"]([^ "'<>]+)/g },
+		  cwd: '<%= folders.tmp %>',
+			src: [ "**/*.html" ]
     },
   },
 });
